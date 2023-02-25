@@ -34,7 +34,7 @@ namespace DWC_NightOwlProject.Controllers
             ViewBag.Temp = temp;
             ViewBag.Presence = presence;
             ViewBag.Frequency = frequency;
-            ViewBag.Prompt = " Create a Dungeons and Dragons Backstory.  " + ViewBag.FromScratch + "Make the length of the backstory roughly" + ViewBag.MaxLength + " words.";
+            ViewBag.Prompt = " Create a Dungeons and Dragons Backstory.  " + ViewBag.FromScratch + " Make the length of the backstory roughly " + ViewBag.MaxLength + " characters.";
             TempData["HoldPrompt"] = ViewBag.Prompt;
             TempData["HoldTemp"] = temp.ToString();
             TempData["HoldPresence"] = presence.ToString();
@@ -103,7 +103,7 @@ namespace DWC_NightOwlProject.Controllers
             var f = Convert.ToDouble(frequency);
 
 
-            var APIKey = _config["APIKey"];
+            var APIKey = _config["APIKey"]; ;
             var api = new OpenAIClient(new OpenAIAuthentication(APIKey));
             var backstory = await api.CompletionsEndpoint.CreateCompletionAsync(material.Prompt, max_tokens: 1000, temperature: t, presencePenalty: p, frequencyPenalty: f, model: OpenAI.Models.Model.Davinci);
             /*var backstory = await api.CompletionsEndpoint.CreateCompletionAsync(material.Prompt, max_tokens: 1000, temperature: 0.8, presencePenalty: 0.1, frequencyPenalty: 0.1, model: OpenAI.Models.Model.Davinci);*/

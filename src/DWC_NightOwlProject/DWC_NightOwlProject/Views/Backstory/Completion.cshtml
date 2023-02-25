@@ -25,10 +25,27 @@
 
 
 
-@Model.Completion
+<p id="backstoryCompletion" >@Model.Completion</p>
+
+<br />
+<br />
+<button id="backstoryButton" type="button" class="btn btn-primary" data-download="backstoryCompletion">Download your Backstory</button>
 
 
 
+<script type="text/javascript">
+    const backstoryCompletionId = document.getElementById("backstoryCompletion");
+    const backstoryButtonId = document.getElementById("backstoryButton");
+
+    $.ajax({
+        type: "GET",
+        url: "/Backstory/Completion",
+        contentType: "application/text; charset=UTF-8",
+        success: function (data) {
+            $("#backstoryCompletion")
+        }
+    })
+</script>
 
 @*   <script type="text/jscript">
                      $('#create-template-button').click(function () {
