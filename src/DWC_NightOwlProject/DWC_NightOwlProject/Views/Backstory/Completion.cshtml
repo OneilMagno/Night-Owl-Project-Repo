@@ -34,17 +34,19 @@
 
 
 <script type="text/javascript">
-    const backstoryCompletionId = document.getElementById("backstoryCompletion");
-    const backstoryButtonId = document.getElementById("backstoryButton");
+    const fs = require('fs');
+    //const backstoryCompletionId = document.getElementById("backstoryCompletion");
+    //const backstoryButtonId = document.getElementById("backstoryButton");
+    $('backstoryButton').click( function () {
+        let data = @Model.Completion;
 
-    $.ajax({
-        type: "GET",
-        url: "/Backstory/Completion",
-        contentType: "application/text; charset=UTF-8",
-        success: function (data) {
-            $("#backstoryCompletion")
-        }
+        fs.writeFile('backstory.txt', data, (err) => {
+            if (err) throw err;
+
+            console.log(data);
+        })
     })
+    
 </script>
 
 @*   <script type="text/jscript">
