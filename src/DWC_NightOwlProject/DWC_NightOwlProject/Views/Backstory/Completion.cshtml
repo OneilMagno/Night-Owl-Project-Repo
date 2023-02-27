@@ -38,12 +38,8 @@
     //const backstoryCompletionId = document.getElementById("backstoryCompletion");
     //const backstoryButtonId = document.getElementById("backstoryButton");
     $('backstoryButton').click( function () {
-        let data = @Model.Completion;
-
-        fs.writeFile('backstory.txt', data, (err) => {
-            if (err) throw err;
-
-            console.log(data);
+        $.get("/Backstory/Completion", {completion: @Model.Completion}, function(data) {
+            alert("Data: " + data)
         })
     })
     
