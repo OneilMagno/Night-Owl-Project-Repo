@@ -47,6 +47,12 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllerRoute(
+    name: "backstory",
+    pattern: "api/Backstory/{id}",
+    defaults: new { controller = "BackstoryApi", action="GetMaterials"}
+    );
+
+app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();

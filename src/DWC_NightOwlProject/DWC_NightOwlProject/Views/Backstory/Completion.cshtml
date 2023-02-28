@@ -37,9 +37,9 @@
     const fs = require('fs');
     //const backstoryCompletionId = document.getElementById("backstoryCompletion");
     //const backstoryButtonId = document.getElementById("backstoryButton");
-    $('backstoryButton').click( function () {
+    $('#backstoryButton').click( function () {
         $.get("/Backstory/Completion", {completion: @Model.Completion}, function(data) {
-            alert("Data: " + data)
+            alert("Data: " + data);
         })
     })
     
