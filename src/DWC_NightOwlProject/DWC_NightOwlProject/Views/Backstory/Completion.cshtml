@@ -11,11 +11,7 @@
 
 
 
-<h4>
-    Prompt:  <br />
 
-    @Model.Prompt
-</h4>
 
 
 
@@ -25,7 +21,9 @@
 
 
 
-<p id="backstoryCompletion" >@Model.Completion</p>
+@Model.Completion
+
+<br />
 
 <a href="@Url.Action("Save","Backstory")">Save</a>  <a href="@Url.Action("Index","Backstory")">Discard</a>
 
