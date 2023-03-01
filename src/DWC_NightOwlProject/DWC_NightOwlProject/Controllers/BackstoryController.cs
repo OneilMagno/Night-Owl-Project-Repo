@@ -166,7 +166,7 @@ namespace DWC_NightOwlProject.Controllers
             var f = Convert.ToDouble(frequency);
 
 
-            var APIKey = "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";
+            var APIKey = _config["APIKey"];
             var api = new OpenAIClient(new OpenAIAuthentication(APIKey));
             var backstory = await api.CompletionsEndpoint.CreateCompletionAsync(material.Prompt, max_tokens: 1000, temperature: t, presencePenalty: p, frequencyPenalty: f, model: OpenAI.Models.Model.Davinci);
             /*var backstory = await api.CompletionsEndpoint.CreateCompletionAsync(material.Prompt, max_tokens: 1000, temperature: 0.8, presencePenalty: 0.1, frequencyPenalty: 0.1, model: OpenAI.Models.Model.Davinci);*/
@@ -195,7 +195,7 @@ namespace DWC_NightOwlProject.Controllers
 
         public async Task<string> BuildCompletion(string completion)
         {
-            var APIKey = "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";
+            var APIKey = _config["APIKey"];
             var api = new OpenAIClient(new OpenAIAuthentication(APIKey));
             var backstory = await api.CompletionsEndpoint.CreateCompletionAsync("Create my background story for my Dungeons and Dragons Campaign. Theme: Comical. Mogarr the Loser wants to steal all the music from the realm!", max_tokens: 200, temperature: 0.8, presencePenalty: 0.1, frequencyPenalty: 0.1, model: OpenAI.Models.Model.Davinci);
             var result = backstory.ToString();
