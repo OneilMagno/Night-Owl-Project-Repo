@@ -31,9 +31,17 @@ public partial class Material
     [StringLength(1000)]
     public string Prompt { get; set; } = null!;
 
-    
+
     public string Completion { get; set; } = null!;
 
     [Column("TemplateID")]
     public int TemplateId { get; set; }
+
+    [ForeignKey("TemplateId")]
+    [InverseProperty("Materials")]
+    public virtual Template Template { get; set; } = null!;
+
+    [ForeignKey("WorldId")]
+    [InverseProperty("Materials")]
+    public virtual World World { get; set; } = null!;
 }
