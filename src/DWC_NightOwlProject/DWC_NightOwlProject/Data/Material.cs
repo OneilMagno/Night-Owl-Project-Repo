@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 namespace DWC_NightOwlProject.Data;
 
 [Table("Material")]
+[Index("TemplateId", Name = "IX_Material_TemplateID")]
+[Index("WorldId", Name = "IX_Material_WorldID")]
 public partial class Material
 {
     [Key]
@@ -29,7 +31,7 @@ public partial class Material
     [StringLength(1000)]
     public string Prompt { get; set; } = null!;
 
-    [StringLength(1000)]
+    
     public string Completion { get; set; } = null!;
 
     [Column("TemplateID")]

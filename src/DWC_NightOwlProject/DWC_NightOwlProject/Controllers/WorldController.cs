@@ -7,6 +7,7 @@ using System.Security.Claims;
 using DWC_NightOwlProject.DAL.Abstract;
 using Microsoft.EntityFrameworkCore;
 using DWC_NightOwlProject.DAL.Concrete;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
 namespace DWC_NightOwlProject.Controllers;
@@ -15,27 +16,39 @@ public class WorldController : Controller
 {
     private readonly ILogger<WorldController> _logger;
     private IWorldRepository worldRepo;
+        private readonly UserManager<IdentityUser> _userManager;
 
-    public WorldController(ILogger<WorldController> logger, IWorldRepository repo)
+    public WorldController(ILogger<WorldController> logger, IWorldRepository repo, UserManager<IdentityUser> um)
     {
+        _userManager=um;
         _logger = logger;
         worldRepo=repo;
     }
 
+    [Authorize]
     public IActionResult Index()
     {
+        String userId = _userManager.GetUserId(User);
+        ViewModelWorld vmw=new ViewModelWorld();
+        World userWorld=getUserWorld(userId);
+        if(userWorld!=null)
+        {
+            vmw.ThisWorld=userWorld;
+            return View(vmw);
+        }
         return View();
     }
 
     [HttpPost]
     public IActionResult Index(ViewModelWorld w)
     {
-        String userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        String userId = _userManager.GetUserId(User);
         if(userId!=null)
         {
             World newWorld=new World();
             newWorld.UserId=userId;
             newWorld.CreationDate=DateTime.Now;
+            newWorld.Name=w.WorldName;
             try
             {
                 worldRepo.AddOrUpdate(newWorld);
@@ -60,5 +73,16 @@ public class WorldController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+    
+
+    public World getUserWorld(string userid)
+    {
+        World w=worldRepo.GetUserWorld(userid);
+        if(w!=null)
+        {
+            return w;
+        }
+        return null;
     }
 }
