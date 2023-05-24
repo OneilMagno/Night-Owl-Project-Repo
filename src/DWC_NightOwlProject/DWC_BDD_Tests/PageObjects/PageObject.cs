@@ -59,6 +59,15 @@ namespace DWC_BDD_Tests.PageObjects
 
         public IWebElement GetNavBarLink(string id) => _webDriver.FindElement(By.Id(id));
 
+        public IWebElement modeToggler => _webDriver.FindElement(By.Id("toggler_input"));
+
+
+        public void clickModeToggler()
+        {
+            modeToggler.Click();
+        }
+
+
         public bool SaveAllCookies()
         {
             ReadOnlyCollection<Cookie> cookies = _webDriver.Manage().Cookies.AllCookies;

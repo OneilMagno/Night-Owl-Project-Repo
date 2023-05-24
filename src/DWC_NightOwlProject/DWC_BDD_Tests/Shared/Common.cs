@@ -21,7 +21,8 @@ namespace DWC_BDD_Tests.Shared
         {
             { "Home" , "/" },
             { "Login", "/Identity/Account/Login" },
-            { "Backstory", "/Backstory" }
+            { "Backstory", "/Backstory" },
+            { "Maps", "/Maps" }
         };
 
         public static string PathFor(string pathName) => Paths[pathName];
