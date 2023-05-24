@@ -19,7 +19,9 @@ namespace DWC_BDD_Tests.PageObjects
         public IWebElement BackstoryButton => _webDriver.FindElement(By.Id("backstoryButton"));
         public IWebElement CharactersButton => _webDriver.FindElement(By.Id("Nav_Bar_Character"));
 
-        public IWebElement NavbarTogglerButton => _webDriver.FindElement(By.CssSelector("button.navbar-toggler"));
+        public IWebElement NavbarTogglerButton => _webDriver.FindElement(By.Name("button.navbar-toggler"));
+
+        public IWebElement NavBarSongs => _webDriver.FindElement(By.Name("songs"));
         public IWebElement offcanvasNavbar => _webDriver.FindElement(By.Id("offcanvasNavbar"));
 
         public IWebElement offcanvasCloseButton => _webDriver.FindElement(By.CssSelector("button.btn-close"));
@@ -36,6 +38,12 @@ namespace DWC_BDD_Tests.PageObjects
         public void NavigateTo()
         {
             _webDriver.Navigate().GoToUrl("https://localhost:7282/");
+        }
+        public void NavigateToItems(string pageName)
+        {
+            string url = "https://localhost:7282/Items"; // Set the URL based on the pageName
+            _webDriver.Navigate().GoToUrl(url);
+            
         }
         public string GetPageName()
         {
@@ -60,6 +68,11 @@ namespace DWC_BDD_Tests.PageObjects
         public void ClickNavbarTogglerButton()
         {
             NavbarTogglerButton.Click();
+        }
+
+        public void ClickNavBarSongs()
+        {
+            NavBarSongs.Click();
         }
         public void ClickOffcanvasCloseButton()
         {
