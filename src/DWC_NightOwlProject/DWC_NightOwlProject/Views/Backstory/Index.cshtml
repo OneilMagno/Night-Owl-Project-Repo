@@ -75,7 +75,7 @@
                                 <span asp-validation-for="r3" class="text-danger"></span>
 
                                 <label asp-for="r4" class="control-label">How long should this backstory be, from 100 to 1000 characters?</label>
-                                <input asp-for="r4" class="form-control" type = "range" required />
+                                <input asp-for="r4" class="form-control" type="range" required step = 100 min="100" max="1000" />
                                 <span asp-validation-for="r4" class="text-danger"></span>
 
 
