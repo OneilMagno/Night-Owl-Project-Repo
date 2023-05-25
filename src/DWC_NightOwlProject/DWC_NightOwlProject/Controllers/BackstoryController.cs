@@ -78,7 +78,7 @@ namespace DWC_NightOwlProject.Controllers
 
                     var APIKey = _config["APIKey"];
                     var api = new OpenAIClient(new OpenAIAuthentication(APIKey));
-                    var newBackstory = await api.CompletionsEndpoint.CreateCompletionAsync(backstory.Prompt, max_tokens: 1000, temperature: 2, presencePenalty: 0, frequencyPenalty: 0, model: OpenAI.Models.Model.Davinci);
+                    var newBackstory = await api.CompletionsEndpoint.CreateCompletionAsync(backstory.Prompt, max_tokens: 1000, temperature: .5, presencePenalty: .5, frequencyPenalty: .5, model: OpenAI.Models.Model.Davinci);
                     backstory.Completion = newBackstory.ToString();
                     _backstoryRepository.AddOrUpdate(backstory);
 
@@ -144,7 +144,7 @@ namespace DWC_NightOwlProject.Controllers
                 var APIKey = _config["APIKey"];
                 var api = new OpenAIClient(new OpenAIAuthentication(APIKey));
                 var backstoryList = await api.ImagesEndPoint.GenerateImageAsync(backstory.Prompt, 1, ImageSize.Large);
-                var newBackstory = await api.CompletionsEndpoint.CreateCompletionAsync(backstory.Prompt, max_tokens: 1000, temperature: 2, presencePenalty: 1, frequencyPenalty: 1, model: OpenAI.Models.Model.Davinci);
+                var newBackstory = await api.CompletionsEndpoint.CreateCompletionAsync(backstory.Prompt, max_tokens: 1000, temperature: .5, presencePenalty: .5, frequencyPenalty: 5, model: OpenAI.Models.Model.Davinci);
                 backstory.Completion = newBackstory.ToString();
                 _backstoryRepository.AddOrUpdate(backstory);
 
