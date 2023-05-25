@@ -53,8 +53,8 @@ builder.Services.AddScoped<IItemRepository, ItemRepository>();
 
 builder.Services.AddScoped<DbContext, WebAppDbContext>();
 
-builder.Services.AddTransient<IEmailSender, EmailSender>();
-builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+//builder.Services.AddTransient<IEmailSender, EmailSender>();
+//builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
 builder.Services.ConfigureApplicationCookie(o => {
     o.ExpireTimeSpan = TimeSpan.FromDays(5);

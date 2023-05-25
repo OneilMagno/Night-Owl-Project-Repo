@@ -166,9 +166,9 @@ namespace DWC_NightOwlProject.Controllers
         public ActionResult Details(int id)
         {
             string userId = _userManager.GetUserId(User);
-            var material = new Quest();
-            material = questRepository.GetQuestByIdandMaterialId(userId,id);
-            return View(material);
+            var quest = new Quest();
+            quest = questRepository.GetQuestByIdandMaterialId(userId,id);
+            return View(quest);
         }
 
         // GET: QuestController/Create
@@ -322,9 +322,9 @@ namespace DWC_NightOwlProject.Controllers
         public ActionResult Delete(int id)
         {
             string userId = _userManager.GetUserId(User);
-            var material = new Quest();
-            material = questRepository.GetQuestByIdandMaterialId(userId, id);
-            return View(material);
+            var quest = new Quest();
+            quest = questRepository.GetQuestByIdandMaterialId(userId, id);
+            return View(quest);
         }
 
         // POST: QuestController/Delete/5
@@ -335,9 +335,9 @@ namespace DWC_NightOwlProject.Controllers
             try
             {
                 string userId = _userManager.GetUserId(User);
-                var material = new Quest();
-                material = questRepository.GetQuestByIdandMaterialId(userId, id);
-                questRepository.Delete(material);
+                var quest = new Quest();
+                quest = questRepository.GetQuestByIdandMaterialId(userId, id);
+                questRepository.Delete(quest);
 
 
                 return RedirectToAction(nameof(Index));
