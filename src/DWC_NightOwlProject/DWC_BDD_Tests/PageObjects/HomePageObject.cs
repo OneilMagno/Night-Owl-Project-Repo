@@ -26,6 +26,14 @@ namespace DWC_BDD_Tests.PageObjects
 
         public IWebElement offcanvasCloseButton => _webDriver.FindElement(By.CssSelector("button.btn-close"));
 
+        public IWebElement modeToggler => _webDriver.FindElement(By.CssSelector("input[class='toggler_input']"));
+
+        public IWebElement bgImg => _webDriver.FindElement(By.CssSelector("body.darkMode"));
+
+        public void ClickModeToggler()
+        {
+            modeToggler.Click();
+        }
 
         public void NavigateTo()
         {
