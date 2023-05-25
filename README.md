@@ -8,11 +8,3 @@ Project Repository for Night Owl Studios
 
 
 
-
-
-
-
-
-
-
-*add upload/edit features. Still a work in progress on how to incorporate it to the vision statement.
