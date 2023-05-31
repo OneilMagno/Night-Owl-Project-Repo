@@ -12,4 +12,6 @@ DROP TABLE [Quests];
 DROP TABLE [Maps];
 DROP TABLE [Characters];
 DROP TABLE  [Material];
-DROP TABLE  [Template];
+DROP TABLE  [Songs];
+DROP TABLE [Items];
+DROP TABLE [Encounter];

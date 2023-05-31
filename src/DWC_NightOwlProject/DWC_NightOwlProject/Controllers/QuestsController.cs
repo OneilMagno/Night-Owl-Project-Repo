@@ -23,12 +23,14 @@ namespace DWC_NightOwlProject.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IRepository<Template> _templateRepository;
         private readonly IRepository<World> _worldRepository;
+        private readonly IQuestRepository questRepository;
+        private readonly IBackstoryRepository backstoryRepo;
         private readonly string materialType="Quest";
         private IWorldRepository worldRepo;
 
         public QuestsController(IMaterialRepository materialRepository, IConfiguration config,
                                    UserManager<IdentityUser> userManager, IRepository<Template> templateRepository,
-                                   IRepository<World> worldRepository, IWorldRepository wRepo)
+                                   IRepository<World> worldRepository, IWorldRepository wRepo, IQuestRepository qRepo, IBackstoryRepository back)
         {
             _materialRepository = materialRepository;
             _config = config;
@@ -36,6 +38,8 @@ namespace DWC_NightOwlProject.Controllers
             _templateRepository = templateRepository;
             _worldRepository = worldRepository;
             worldRepo=wRepo;
+            questRepository=qRepo;
+            backstoryRepo=back;
         }
 
         [Authorize]
@@ -62,23 +66,23 @@ namespace DWC_NightOwlProject.Controllers
         public IActionResult SaveGuidedQuest(GuidedQuestViewModel qm)
         {
             String userId = _userManager.GetUserId(User);
-            World userWorld=getUserWorld(userId);
-            Material m= new Material();
-            m.Type=materialType;
-            m.UserId=userId;
-            m.WorldId=userWorld.Id;
-            m.Completion=qm.Results;
-            m.Name="";
-            m.Prompt="";
-            m.Id=0;
-            m.CreationDate=DateTime.Now;
+            //World userWorld=getUserWorld(userId);
+            Quest q= new Quest();
+            //q.Type=materialType;
+            q.UserId=userId;
+            //q.WorldId=userWorld.Id;
+            q.Completion=qm.Results;
+            q.Name="";
+            q.Prompt="";
+            q.Id=0;
+            q.CreationDate=DateTime.Now;
             if(userId!=null)
             {
                 try
                 {
-                    _materialRepository.AddOrUpdate(m);
-                    ViewBag.Message("Quest saved");
-                    return View("ContinueGuidedQuest", qm);
+                    questRepository.AddOrUpdate(q);
+                    //ViewBag.Message("Quest saved");
+                    return View("Index");
                 }
                 catch(DbUpdateConcurrencyException e)
                 {
@@ -88,7 +92,8 @@ namespace DWC_NightOwlProject.Controllers
             }
             return View("ContinueGuidedQuest", qm);
         }
-
+        
+        [Authorize]
         public IActionResult GuidedQuestTemplate()
         {
             return View();
@@ -102,16 +107,42 @@ namespace DWC_NightOwlProject.Controllers
             }
             return null;
         }
+        [Authorize]
+        public IActionResult CreateWithReference()
+        {
+            string id = _userManager.GetUserId(User);
+            ReferenceSelector rs=new ReferenceSelector();
+            rs.Backstories=backstoryRepo.GetAllBackstoriesById(id);
+            return View(rs);
+        }
+        public async Task<IActionResult> ReferenceCompletion(ReferenceSelector rs)
+        {
+            string id = _userManager.GetUserId(User);
+            var key=_config["APIKey"];
+            var api=new OpenAIClient(new OpenAIAuthentication(key));
+            var result = await api.CompletionsEndpoint.CreateCompletionAsync(rs.promptQuest(), max_tokens: 1000, temperature: .5, presencePenalty: .5, frequencyPenalty: .5, model: OpenAI.Models.Model.Davinci);
+            rs.evm.Result=result.ToString();
+            var q = new Quest();
+            q.UserId = id;
+            q.Id = 0;
+            q.Name = "";
+            //q.Type = "Quest";
+            q.CreationDate = DateTime.Now;
+            q.Prompt = "";
+            q.Completion = result.ToString();
+
+            return View("Completion",q);
+        }
 
         [Authorize]
         public IActionResult Index()
         {
             var vm = new MaterialVM();
             string id = _userManager.GetUserId(User);
-            var result = new List<Material>();
-            result = _materialRepository.GetAllQuestsById(id);
+            var result = new List<Quest>();
+            result = questRepository.GetAllQuestsById(id);
 
-            vm.materials = result;
+            vm.quests = result;
             return View(vm);
         }
 
@@ -134,10 +165,10 @@ namespace DWC_NightOwlProject.Controllers
         // GET: QuestController/Details/5
         public ActionResult Details(int id)
         {
-            var userId = _userManager.GetUserId(User);
-            var material = new Material();
-            material = _materialRepository.GetQuestById(userId,id);
-            return View(material);
+            string userId = _userManager.GetUserId(User);
+            var quest = new Quest();
+            quest = questRepository.GetQuestByIdandMaterialId(userId,id);
+            return View(quest);
         }
 
         // GET: QuestController/Create
@@ -197,11 +228,11 @@ namespace DWC_NightOwlProject.Controllers
 
 
 
-            var material = new Material();
+            var material = new Quest();
             material.UserId = userId;
             material.Id = 0;
             material.Name = "";
-            material.Type = "Backstory";
+            //material.Type = "Backstory";
             material.CreationDate = DateTime.Now;
             material.Prompt = TempData.Peek("HoldPrompt").ToString();
             material.Prompt += "...";
@@ -237,18 +268,18 @@ namespace DWC_NightOwlProject.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            var material = new Material();
-            material.UserId = userId;
-            material.Id = 0;
-            material.Name = "";
-            material.Type = "Quest";
-            material.CreationDate = DateTime.Now;
-            material.Prompt = TempData.Peek("HoldPrompt").ToString();
-            material.Prompt += "...";
-            material.Completion = TempData.Peek("HoldCompletion").ToString();
+            var q = new Quest();
+            q.UserId = userId;
+            q.Id = 0;
+            q.Name = "";
+            //q.Type = "Quest";
+            q.CreationDate = DateTime.Now;
+            q.Prompt = TempData.Peek("HoldPrompt").ToString();
+            q.Prompt += "...";
+            q.Completion = TempData.Peek("HoldCompletion").ToString();
 
-            _materialRepository.AddOrUpdate(material);
-            return RedirectToAction("Index", material);
+            questRepository.AddOrUpdate(q);
+            return RedirectToAction("Index", q);
         }
 
         // POST: QuestController/Create
@@ -290,10 +321,10 @@ namespace DWC_NightOwlProject.Controllers
         // GET: QuestController/Delete/5
         public ActionResult Delete(int id)
         {
-            var userId = _userManager.GetUserId(User);
-            var material = new Material();
-            material = _materialRepository.GetQuestById(userId, id);
-            return View(material);
+            string userId = _userManager.GetUserId(User);
+            var quest = new Quest();
+            quest = questRepository.GetQuestByIdandMaterialId(userId, id);
+            return View(quest);
         }
 
         // POST: QuestController/Delete/5
@@ -303,10 +334,10 @@ namespace DWC_NightOwlProject.Controllers
         {
             try
             {
-                var userId = _userManager.GetUserId(User);
-                var material = new Material();
-                material = _materialRepository.GetQuestById(userId, id);
-                _materialRepository.Delete(material);
+                string userId = _userManager.GetUserId(User);
+                var quest = new Quest();
+                quest = questRepository.GetQuestByIdandMaterialId(userId, id);
+                questRepository.Delete(quest);
 
 
                 return RedirectToAction(nameof(Index));

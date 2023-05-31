@@ -8,23 +8,32 @@ using Microsoft.AspNetCore.Authorization;
 using OpenAI;
 using OpenAI.Images;
 using System.Net;
-
+using DWC_NightOwlProject.ViewModel;
 
 namespace DWC_NightOwlProject.Controllers;
 
 public class MapsController : Controller
 {
     private IMaterialRepository _materialRepository;
+    private IMapRepository _mapRepository;
+    private IBackstoryRepository backstoryRepo;
+    private IQuestRepository questRepo;
+    private IEncounterRepository encounterRepo; 
     private readonly IConfiguration _config;
     private readonly UserManager<IdentityUser> _userManager;
     private IWebHostEnvironment _environment;
     public MapsController(IMaterialRepository materialRepository, IConfiguration config,
-                                   UserManager<IdentityUser> userManager, IWebHostEnvironment environment)
+                                   UserManager<IdentityUser> userManager, IWebHostEnvironment environment,
+                                   IMapRepository mapRepository, IBackstoryRepository back, IQuestRepository quest,IEncounterRepository encounter)
     {
         _materialRepository = materialRepository;
+        _mapRepository = mapRepository;
         _config = config;
         _userManager = userManager;
         _environment = environment;
+        backstoryRepo=back;
+        questRepo=quest;
+        encounterRepo=encounter;
     }
     [Authorize]
     public IActionResult Index()
@@ -33,71 +42,13 @@ public class MapsController : Controller
 
 
         string id = _userManager.GetUserId(User);
-        var result = new List<Material>();
-        result = _materialRepository.GetAllMapsById(id);
+        var result = new List<Map>();
+        result = _mapRepository.GetAllMapsById(id);
 
-        vm.materials = result;
+        vm.maps = result;
         return View(vm);
     }
 
-    /*public IActionResult Template()
-    {
-      
-        return RedirectToAction("Index", "Maps");
-    }*/
-    [HttpPost]
-    public IActionResult Upload(IFormFile file)
-    {
-        string userId = _userManager.GetUserId(User);
-        var material = new Material();
-
-        material.UserId = userId;
-        material.Id = 0;
-        material.Type = "MapPreview";
-        material.Name = "New Map";
-        material.CreationDate = DateTime.Now;
-        material.Prompt = " ";
-        material.Prompt += "...";
-
-        material.Completion = " ";
-
-        _materialRepository.AddOrUpdate(material);
-
-
-        using (var memoryStream = new MemoryStream())
-        {
-            file.CopyTo(memoryStream);
-            var fileBytes = memoryStream.ToArray();
-            material.PictureData = fileBytes;
-
-        }
-
-
-
-        _materialRepository.AddOrUpdate(material);
-        return View();
-    }
-
-
-    public async Task<IActionResult> OnPostUploadAsync()
-    {
-
-        var vm = new MaterialVM();
-
-        using (var memoryStream = new MemoryStream())
-        {
-            //await vm.Upload.CopyToAsync(memoryStream);
-
-            // Upload the file if less than 2 MB
-
-
-            vm.PictureData = memoryStream.ToArray();
-
-
-
-            return View();
-        }
-    }
 
 
     [Authorize]
@@ -106,53 +57,47 @@ public class MapsController : Controller
 
         var userId = _userManager.GetUserId(User);
 
-        try
-        {
-            if (_materialRepository.GetAllMapsById(userId).Count() < 4)
+        
+            if (_mapRepository.GetAllMapsById(userId).Count() < 4)
             {
                 ViewBag.Error = "";
 
 
-                var material = new Material();
-                material.Prompt = "Create a Map for my Dungeons and Dragons Campaign. " +
+                var map = new Map();
+                map.Prompt = "Create a Map for my Dungeons and Dragons Campaign. " +
                             "The map should have a square grid overlaying it. "
                                 + "It is: " + collection["r0"]
                                 + ". The biome type is: " + collection["r1"]
-                                + ". The map should have: " + collection["r2"]
-                                + " squares.";
+                                + ". The map should have: " + collection["r2"];
 
 
-                material.UserId = userId;
-                material.Id = 0;
-                material.Type = "Map";
-                material.Name = "New Map";
-                material.CreationDate = DateTime.Now;
-                material.Prompt += "...";
+                map.UserId = userId;
+                map.Id = 0;
+                map.Name = "New Map";
+                map.CreationDate = DateTime.Now;
+                map.Prompt += "...";
 
                 var APIKey = _config["APIKey"];
                 var api = new OpenAIClient(new OpenAIAuthentication(APIKey));
-                var mapList = await api.ImagesEndPoint.GenerateImageAsync(material.Prompt, 1, ImageSize.Large);
-                var map = mapList.FirstOrDefault();
-                var url = map.ToString();
-                material.Completion = url;
+                var mapList = await api.ImagesEndPoint.GenerateImageAsync(map.Prompt, 1, ImageSize.Large);
+                var newMap = mapList.FirstOrDefault();
+                var url = newMap.ToString();
+                map.Completion = url;
                 //string tempPath = Path.GetTempPath();
 
                 // Scrape web page
                 WebClient webClient = new WebClient();
-                material.PictureData = webClient.DownloadData(url);
-                _materialRepository.AddOrUpdate(material);
+                map.PictureData = webClient.DownloadData(url);
+                _mapRepository.AddOrUpdate(map);
             }
 
             else
             {
                 ViewBag.Error = "Too many Map Materials. Please delete 1 or more to create a new map!";
             }
-        }
+        
 
-        catch
-        {
-            throw new Exception("Too many map materials in Database");
-        }
+      
 
         return RedirectToAction("Index", "Maps");
 
@@ -166,35 +111,96 @@ public class MapsController : Controller
 
         try
         {
-            if (_materialRepository.GetAllMapsById(userId).Count() < 4)
+            if (_mapRepository.GetAllMapsById(userId).Count() < 4)
             {
                 ViewBag.Error = "";
 
 
-                var material = new Material();
-                material.Prompt = "Create a Map for my Dungeons and Dragons Campaign. " +
+                var map = new Map();
+                map.Prompt = "Create a Map for my Dungeons and Dragons Campaign. " +
                                     "The map should have a square grid overlaying it. " + collection["r0"];
 
 
-                material.UserId = userId;
-                material.Id = 0;
-                material.Type = "Map";
-                material.Name = "New Map";
-                material.CreationDate = DateTime.Now;
-                material.Prompt += "...";
+                map.UserId = userId;
+                map.Id = 0;
+                map.Name = "New Map";
+                map.CreationDate = DateTime.Now;
+                map.Prompt += "...";
 
                 var APIKey = _config["APIKey"];
                 var api = new OpenAIClient(new OpenAIAuthentication(APIKey));
-                var mapList = await api.ImagesEndPoint.GenerateImageAsync(material.Prompt, 1, ImageSize.Large);
-                var map = mapList.FirstOrDefault();
-                var url = map.ToString();
-                material.Completion = url;
+                var mapList = await api.ImagesEndPoint.GenerateImageAsync(map.Prompt, 1, ImageSize.Large);
+                var newMap = mapList.FirstOrDefault();
+                var url = newMap.ToString();
+                map.Completion = url;
                 //string tempPath = Path.GetTempPath();
 
                 // Scrape web page
                 WebClient webClient = new WebClient();
-                material.PictureData = webClient.DownloadData(url);
-                _materialRepository.AddOrUpdate(material);
+                map.PictureData = webClient.DownloadData(url);
+                _mapRepository.AddOrUpdate(map);
+            }
+
+            else
+            {
+                ViewBag.Error = "Too many Map Materials. Please delete 1 or more to create a new map!";
+            }
+        }
+
+        catch
+        {
+            throw new Exception("Too many map materials in Database");
+        }
+
+        return RedirectToAction("Index", "Maps");
+
+    }
+    [Authorize]
+    public IActionResult CreateWithReference()
+    {
+        string id = _userManager.GetUserId(User);
+        ReferenceSelector rs=new ReferenceSelector();
+        rs.Backstories=backstoryRepo.GetAllBackstoriesById(id);
+        rs.Quests=questRepo.GetAllQuestsById(id);
+        rs.Encounters=encounterRepo.GetAllEncountersById(id);
+        return View(rs);
+    }
+    [Authorize]
+    public async Task<ActionResult> ReferenceCompletion(ReferenceSelector rs)
+    {
+
+        var userId = _userManager.GetUserId(User);
+
+        try
+        {
+            if (_mapRepository.GetAllMapsById(userId).Count() < 4)
+            {
+                ViewBag.Error = "";
+
+
+                var map = new Map();
+                map.Prompt = "Create a Map for my Dungeons and Dragons Campaign. " +
+                                    "The map should have a square grid overlaying it. "+rs.promptMap;
+
+
+                map.UserId = userId;
+                map.Id = 0;
+                map.Name = "New Map";
+                map.CreationDate = DateTime.Now;
+                map.Prompt += "...";
+
+                var APIKey = _config["APIKey"];
+                var api = new OpenAIClient(new OpenAIAuthentication(APIKey));
+                var mapList = await api.ImagesEndPoint.GenerateImageAsync(map.Prompt, 1, ImageSize.Large);
+                var newMap = mapList.FirstOrDefault();
+                var url = newMap.ToString();
+                map.Completion = url;
+                //string tempPath = Path.GetTempPath();
+
+                // Scrape web page
+                WebClient webClient = new WebClient();
+                map.PictureData = webClient.DownloadData(url);
+                _mapRepository.AddOrUpdate(map);
             }
 
             else
@@ -213,65 +219,12 @@ public class MapsController : Controller
     }
 
 
-
-
-
     [Authorize]
-    [HttpPost]
-    public async Task<ActionResult> ImageEdit(IFormCollection collection, IFormFile file)
-    {
-
-        var userId = _userManager.GetUserId(User);
-        //try
-        // {
-        var vm = new MaterialVM();
-        vm.Prompt = "Edit my DnD Map: " + collection["r0"];
-
-        //Create a MemoryStream from the uploaded file
-        MemoryStream memoryStream = new MemoryStream();
-        file.CopyTo(memoryStream);
-
-        //Convert to a Byte Array
-        vm.PictureData = memoryStream.ToArray();
-
-
-
-
-
-        var material = new Material();
-
-        material.UserId = userId;
-        material.Id = 0;
-        material.Type = "MapPreview";
-        material.Name = "New Map";
-        material.CreationDate = DateTime.Now;
-        material.Prompt = vm.Prompt;
-        material.Prompt += "...";
-        material.PictureData = vm.PictureData;
-        material.Completion = " ";
-
-        _materialRepository.AddOrUpdate(material);
-
-
-
-
-
-
-        return RedirectToAction("EditCompletion", "Maps", vm);
-
-    }
-
-
-
-
-
-
-    [Authorize]
-    public async Task<ActionResult> Completion(Material material)
+    public async Task<ActionResult> Completion(Map map)
     {
 
 
-        return View(material);
+        return View(map);
 
     }
 
@@ -284,15 +237,14 @@ public class MapsController : Controller
 
         var userId = _userManager.GetUserId(User);
 
-        var material = new Material();
+        var map = new Map();
 
-        material.UserId = userId;
-        material.Id = 0;
-        material.Type = "Map";
-        material.Name = "Map";
-        material.CreationDate = DateTime.Now;
-        material.Prompt = vm.Prompt;
-        material.Prompt += "...";
+        map.UserId = userId;
+        map.Id = 0;
+        map.Name = "Map";
+        map.CreationDate = DateTime.Now;
+        map.Prompt = vm.Prompt;
+        map.Prompt += "...";
 
         //ImageConverter imageConverter = new ImageConverter();
         //byte[] vmByte = (byte[])imageConverter.ConvertTo(vm.upload, typeof(byte[]));
@@ -327,7 +279,7 @@ public class MapsController : Controller
                 //The split string from the HttpResponseMessageBody, this is only the url. Don't change the 7 value.
                 var result = bodyArray[7];
 
-                material.Completion = result;
+                map.Completion = result;
 
 
             }
@@ -337,14 +289,13 @@ public class MapsController : Controller
 
 
 
-        return View(material);
+        return View(map);
 
     }
 
-    public ActionResult Save(Material material)
+    public ActionResult Save(Map map)
     {
-        material.Type = "Map";
-        _materialRepository.AddOrUpdate(material);
+        _mapRepository.AddOrUpdate(map);
         return RedirectToAction("Maps/Index");
     }
 
@@ -352,10 +303,10 @@ public class MapsController : Controller
     public ActionResult Details(int id)
     {
         var userId = _userManager.GetUserId(User);
-        var material = new Material();
-        material = _materialRepository.GetMapByIdandMaterialId(userId, id);
+        var map = new Map();
+        map = _mapRepository.GetMapByIdandMaterialId(userId, id);
 
-        return View(material);
+        return View(map);
     }
 
 
@@ -363,9 +314,9 @@ public class MapsController : Controller
     public ActionResult Edit(int id)
     {
         var userId = _userManager.GetUserId(User);
-        var material = new Material();
-        material = _materialRepository.GetMapByIdandMaterialId(userId, id);
-        return View(material);
+        var map = new Map();
+        map = _mapRepository.GetMapByIdandMaterialId(userId, id);
+        return View(map);
     }
 
     // POST: HomeController1/Edit/5
@@ -376,10 +327,10 @@ public class MapsController : Controller
         try
         {
             var userId = _userManager.GetUserId(User);
-            var material = new Material();
-            material = _materialRepository.GetMapByIdandMaterialId(userId, id);
-            material.Name = Request.Form["Name"].ToString();
-            _materialRepository.AddOrUpdate(material);
+            var map = new Map();
+            map = _mapRepository.GetMapByIdandMaterialId(userId, id);
+            map.Name = Request.Form["Name"].ToString();
+            _mapRepository.AddOrUpdate(map);
             return RedirectToAction(nameof(Index));
         }
         catch
@@ -392,9 +343,9 @@ public class MapsController : Controller
     public ActionResult Delete(int id)
     {
         var userId = _userManager.GetUserId(User);
-        var material = new Material();
-        material = _materialRepository.GetMapByIdandMaterialId(userId, id);
-        return View(material);
+        var map = new Map();
+        map = _mapRepository.GetMapByIdandMaterialId(userId, id);
+        return View(map);
     }
 
     // POST: HomeController1/Delete/5
@@ -405,9 +356,9 @@ public class MapsController : Controller
         try
         {
             var userId = _userManager.GetUserId(User);
-            var material = new Material();
-            material = _materialRepository.GetMapByIdandMaterialId(userId, id);
-            _materialRepository.Delete(material);
+            var map = new Map();
+            map = _mapRepository.GetMapByIdandMaterialId(userId, id);
+            _mapRepository.Delete(map);
 
 
             return RedirectToAction(nameof(Index));

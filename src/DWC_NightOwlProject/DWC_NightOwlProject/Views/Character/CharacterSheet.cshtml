@@ -1,12 +1,12 @@
 @model DWC_NightOwlProject.Models.SheetRandomizer
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Character Sheet";
 }
 <script src="~/js/sheetabilities.js"></script>
 <div class="text-center">
     <div class="container">
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm">
                 <div id="basicinfo">
                     <h1>@Model.Name</h1>
                     <p>LVL 1 @Model.Race @Model.Class</p>
@@ -50,69 +50,97 @@
                     </div>*@
                     <div id="spells">
                         <table id="spellsheet" class="abilities">
-                            <thead><th>Level</th><th>Spell</th></thead>
+                            <thead>
+                            <th style="color: white">Level</th>
+                            <th style="color: white">Spell</th></thead>
                             <tbody></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-2" id="stats">
+            <div class="col-sm" id="stats">
                 <table id="Str" class="prof">
-                    <thead><th>Proficient</th><th>Skill</th><th>Bonus</th></thead>
+                    <thead>
+                    <th style="color: white" >Proficient</th>
+                    <th style="color: white">Skill</th>
+                    <th style="color: white" >Bonus</th></thead>
                     <tbody>
                     @foreach(string s in @DWC_NightOwlProject.Models.CharacterOptions.StrProficiencies)
                     {
-                        <tr><td><input type="checkbox"></td><td>@s</td><td id="modifier">@DWC_NightOwlProject.Models.CharacterOptions.Modifier(@Model.Scores[0])</td></tr>
+                            <tr><td><input type="checkbox"></td><td style="color: rgb(238, 217, 222)">@s</td><td id="modifier" style="color: rgb(238, 217, 222)">@DWC_NightOwlProject.Models.CharacterOptions.Modifier(@Model.Scores[0])</td></tr>
                     }
                     </tbody>
                 </table>
                 <table id="Dex" class="prof">
-                    <thead><th>Proficient</th><th>Skill</th><th>Bonus</th></thead>
+                    <thead>
+                    <th style="color: white">Proficient</th>
+                    <th style="color: white">Skill</th>
+                    <th style="color: white">Bonus</th></thead>
                     <tbody>
                     @foreach(string s in @DWC_NightOwlProject.Models.CharacterOptions.DexProficiencies)
                     {
-                        <tr><td><input type="checkbox"></td><td>@s</td><td id="modifier">@DWC_NightOwlProject.Models.CharacterOptions.Modifier(@Model.Scores[1])</td></tr>
+                            <tr><td><input type="checkbox"></td><td style="color: rgb(238, 217, 222)">@s</td><td id="modifier" style="color: rgb(238, 217, 222)">@DWC_NightOwlProject.Models.CharacterOptions.Modifier(@Model.Scores[1])</td></tr>
                     }
                     </tbody>
                 </table>
                 <table id="Con" class="prof">
-                    <thead><th>Proficient</th><th>Skill</th><th>Bonus</th></thead>
+                    <thead>
+                    <th style="color: white">Proficient</th>
+                    <th style="color: white">Skill</th>
+                    <th style="color: white">Bonus</th></thead>
                     <tbody>
                     @foreach(string s in @DWC_NightOwlProject.Models.CharacterOptions.ConProficiencies)
                     {
-                        <tr><td><input type="checkbox"></td><td>@s</td><td id="modifier">@DWC_NightOwlProject.Models.CharacterOptions.Modifier(@Model.Scores[2])</td></tr>
+                            <tr><td><input type="checkbox"></td><td style="color: rgb(238, 217, 222)">@s</td><td id="modifier" style="color: rgb(238, 217, 222)">@DWC_NightOwlProject.Models.CharacterOptions.Modifier(@Model.Scores[2])</td></tr>
                     }
                     </tbody>
                 </table>
                 <table id="Int" class="prof">
-                    <thead><th>Proficient</th><th>Skill</th><th>Bonus</th></thead>
+                    <thead>
+                    <th style="color: white">Proficient</th>
+                    <th style="color: white">Skill</th>
+                    <th style="color: white">Bonus</th></thead>
                     <tbody>
                     @foreach(string s in @DWC_NightOwlProject.Models.CharacterOptions.IntProficiencies)
                     {
-                        <tr><td><input type="checkbox"></td><td>@s</td><td id="modifier">@DWC_NightOwlProject.Models.CharacterOptions.Modifier(@Model.Scores[3])</td></tr>
+                            <tr><td><input type="checkbox"></td><td style ="color: rgb(238, 217, 222)">@s</td><td id="modifier" style="color: rgb(238, 217, 222)">@DWC_NightOwlProject.Models.CharacterOptions.Modifier(@Model.Scores[3])</td></tr>
                     }
                     </tbody>
                 </table>
                 <table id="Wis" class="prof">
-                    <thead><th>Proficient</th><th>Skill</th><th>Bonus</th></thead>
+                    <thead>
+                    <th style="color: white">Proficient</th>
+                    <th style="color: white">Skill</th>
+                    <th style="color: white">Bonus</th></thead>
                     <tbody>
                     @foreach(string s in @DWC_NightOwlProject.Models.CharacterOptions.WisProficiencies)
                     {
-                        <tr><td><input type="checkbox"></td><td>@s</td><td id="modifier">@DWC_NightOwlProject.Models.CharacterOptions.Modifier(@Model.Scores[4])</td></tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td style="color: rgb(238, 217, 222)">@s</td>
+                                <td id="modifier" style="color: rgb(238, 217, 222)">@DWC_NightOwlProject.Models.CharacterOptions.Modifier(@Model.Scores[4])</td>
+                            </tr>
                     }
                     </tbody>
                 </table>
                 <table id="Cha" class="prof">
-                    <thead><th>Proficient</th><th>Skill</th><th>Bonus</th></thead>
+                    <thead>
+                    <th style="color: white">Proficient</th>
+                    <th style="color: white">Skill</th>
+                    <th style="color: white">Bonus</th></thead>
                     <tbody>
                     @foreach(string s in @DWC_NightOwlProject.Models.CharacterOptions.ChaProficiencies)
                     {
-                        <tr><td><input type="checkbox"></td><td>@s</td><td id="modifier">@DWC_NightOwlProject.Models.CharacterOptions.Modifier(@Model.Scores[05])</td></tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td style="color: rgb(238, 217, 222)">@s</td>
+                                <td id="modifier" style="color: rgb(238, 217, 222)">@DWC_NightOwlProject.Models.CharacterOptions.Modifier(@Model.Scores[05])</td>
+                            </tr>
                     }
                     </tbody>
                 </table>
             </div>
-            <div class="col-sm-6" id="details">
+            <div class="col-sm" id="details">
                 <div id="features">
                     <h3>Other features</h3>
                 </div>
